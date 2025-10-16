@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 28
-  productGUID: 1bd890735048281008250c8391321b84
+  productGUID: 3bc70fcc5bd5bbc2b82ed95a519c95a8
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -512,7 +512,7 @@ PlayerSettings:
   ps4GarlicHeapSize: 2048
   ps4ProGarlicHeapSize: 2560
   playerPrefsMaxSize: 32768
-  ps4Passcode: 5zvTC6TM782M3aPvCupui5nrnf61D6pG
+  ps4Passcode: ArdSUCd81z9Ngq2kJoaHkpdWhK3Gyo38
   ps4pnSessions: 1
   ps4pnPresence: 1
   ps4pnFriends: 1
@@ -677,13 +677,13 @@ PlayerSettings:
   qnxGraphicConfPath: 
   apiCompatibilityLevel: 6
   captureStartupLogs: {}
-  activeInputHandler: 2
+  activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: 6c30f9c8-68dd-45e6-8e7f-ed1018925ae8
+  cloudProjectId: 
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project 2025-10-07_16-05-25
-  organizationId: unity_ab3d75efed662f4f5a1a
+  projectName: 
+  organizationId: 
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
