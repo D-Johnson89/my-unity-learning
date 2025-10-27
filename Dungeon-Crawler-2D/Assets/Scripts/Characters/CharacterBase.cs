@@ -20,7 +20,6 @@ public abstract class CharacterBase : MonoBehaviour
     public virtual void TakeDamage(int damage = 10)
     {
         currentHealth -= damage;
-        Debug.Log($"Health: {currentHealth}, Damage Taken: {damage}");
         if (currentHealth <= 0) Die();
     }
 
@@ -28,7 +27,8 @@ public abstract class CharacterBase : MonoBehaviour
 
     protected void Move(float x, float y)
     {
-        rb.linearVelocity = new Vector2(x * moveSpeed, y * moveSpeed);
+        Vector2 movement = new Vector2(x, y) * moveSpeed * Time.deltaTime;
+        rb.MovePosition(rb.position + movement);
     }
 
 }
