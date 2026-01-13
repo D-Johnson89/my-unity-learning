@@ -98,3 +98,6 @@ ServerData
 # Auto-generated scenes by play mode tests
 [Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
+# Unity Auto Recovery Files
+[Aa]ssets/_Recover/
+[Aa]ssets/_Recovery.meta
