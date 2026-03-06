@@ -100,5 +100,11 @@ ServerData
 
 # Unity Auto Recovery Files
 [Aa]ssets/_Recover/
+[Aa]ssets/_Recovery.meta
 [Aa]ssets/_Recovery.meta.vscode/
 .vscode/
+
+# Dungeon of Echoes brief
+brief.md
+
+
