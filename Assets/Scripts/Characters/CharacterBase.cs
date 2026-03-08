@@ -7,7 +7,7 @@ public abstract class CharacterBase : MonoBehaviour
     [Header("Base Stats")]
     public int maxHealth = 100;
     public int currentHealth = 10;
-    public float moveSpeed = 5f;
+    public float moveSpeed = 10f;
 
     protected Rigidbody2D rb;
 
