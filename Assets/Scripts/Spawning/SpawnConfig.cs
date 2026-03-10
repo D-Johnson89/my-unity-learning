@@ -7,7 +7,7 @@ public class SpawnConfig
     public GameObject prefab;
     public int spawnCount;
     public float spawnInterval;
-    public Vector3 spawnPosition;
+    public Transform spawnPosition;
     public Quaternion spawnRotation;
     public Transform spawnParent;
 }

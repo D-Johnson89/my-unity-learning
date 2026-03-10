@@ -19,7 +19,7 @@ public class SpawnManager : MonoBehaviour
         for (int i = 0; i < config.spawnCount; i++)
         {
             
-            Instantiate(config.prefab, config.spawnPosition, config.spawnRotation, config.spawnParent);
+            Instantiate(config.prefab, config.spawnPosition.position, config.spawnRotation, config.spawnParent);
             yield return new WaitForSeconds(config.spawnInterval);
         }
     }
