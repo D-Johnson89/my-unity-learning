@@ -9,4 +9,5 @@ public class SpawnConfig
     public float spawnInterval;
     public Vector3 spawnPosition;
     public Quaternion spawnRotation;
+    public Transform spawnParent;
 }
