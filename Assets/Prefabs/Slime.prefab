@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2107114642161679328}
   - component: {fileID: 7798629091136765537}
   - component: {fileID: 1889325833588821577}
+  - component: {fileID: -6301671950995015553}
   m_Layer: 0
   m_Name: Slime
   m_TagString: Untagged
@@ -166,3 +167,29 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
+--- !u!114 &-6301671950995015553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7598507160042207309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45399cdb4b9ba55d797852e3e685bd26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  maxHealth: 100
+  currentHealth: 10
+  moveSpeed: 10
+  player: {fileID: 0}
+  wayPoint1: {x: 0, y: 0, z: 0}
+  wayPoint2: {x: 0, y: 0, z: 0}
+  wayPoint3: {x: 0, y: 0, z: 0}
+  wayPoint4: {x: 0, y: 0, z: 0}
+  waypoints: []
+  targetWayPoint: {x: 0, y: 0, z: 0}
+  positionTolerance: 0.2
+  detectionRadius: 3
+  leashDistance: 10
+  waitTime: 2
