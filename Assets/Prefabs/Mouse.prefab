@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2733610146316505696}
   - component: {fileID: 8488064163656828976}
   - component: {fileID: 4725710722913814749}
-  - component: {fileID: -2282413149703602858}
+  - component: {fileID: -715838837970316034}
   m_Layer: 0
   m_Name: Mouse
   m_TagString: Untagged
@@ -120,7 +120,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!61 &4725710722913814749
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -167,7 +167,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.75, y: 0.75}
   m_EdgeRadius: 0
---- !u!114 &-2282413149703602858
+--- !u!114 &-715838837970316034
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,9 +180,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   maxHealth: 100
-  currentHealth: 10
-  moveSpeed: 10
-  player: {fileID: 0}
+  currentHealth: 0
+  player: {fileID: 2126434880225617718, guid: 8482b650da424726ead1ec1431730cab, type: 3}
   wayPoint1: {x: 0, y: 0, z: 0}
   wayPoint2: {x: 0, y: 0, z: 0}
   wayPoint3: {x: 0, y: 0, z: 0}
@@ -190,6 +189,9 @@ MonoBehaviour:
   waypoints: []
   targetWayPoint: {x: 0, y: 0, z: 0}
   positionTolerance: 0.2
-  detectionRadius: 3
-  leashDistance: 10
-  waitTime: 2
+  detectionRadius: 2
+  leashDistance: 4.5
+  stoppingDistance: 0.8
+  waitTime: 1
+  moveSpeed: 1
+  chaseSpeed: 2
