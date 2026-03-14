@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 9074005489467659578}
   - component: {fileID: 2939721202408332899}
   - component: {fileID: 3422415249403023257}
-  - component: {fileID: 1414245525403299666}
+  - component: {fileID: 635844269280826325}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -167,7 +167,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.6, y: 0.8}
   m_EdgeRadius: 0
---- !u!114 &1414245525403299666
+--- !u!114 &635844269280826325
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,6 +181,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   maxHealth: 100
   currentHealth: 0
-  moveSpeed: 10
   maxMana: 50
   currentMana: 0
+  moveSpeed: 3
+  horizontalInput: 0
+  verticalInput: 0

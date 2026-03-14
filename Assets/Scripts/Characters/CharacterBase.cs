@@ -6,8 +6,8 @@ public abstract class CharacterBase : MonoBehaviour
 {
     [Header("Base Stats")]
     public int maxHealth = 100;
-    public int currentHealth = 10;
-    public float moveSpeed = 10f;
+    public int currentHealth;
+    
 
     protected Rigidbody2D rb;
 
@@ -25,9 +25,9 @@ public abstract class CharacterBase : MonoBehaviour
 
     protected abstract void Die();
 
-    protected void Move(float x, float y)
+    protected void Move(float x, float y, float moveSpeed)
     {
-        Vector2 movement = new Vector2(x, y) * moveSpeed * Time.deltaTime;
+        Vector2 movement = new Vector2(x, y) * moveSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + movement);
     }
 

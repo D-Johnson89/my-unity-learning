@@ -14,36 +14,37 @@ public class EnemyController : CharacterBase
     public Vector3 wayPoint4;
     public Vector3[] waypoints;
     private int currentWayPointIndex = 0;
-    private Vector3 currentPoint;
+    private Vector3 spawnPoint;
     public Vector3 targetWayPoint;
 
     // Enemy variables
-    public float positionTolerance = 0.7f;
+    public float positionTolerance = 0.2f;
     public float detectionRadius = 2f;
-    public float leashDistance = 5f;
+    public float leashDistance = 4.5f;
     public float stoppingDistance = 0.8f;
     public float waitTime = 1f;
+    public float moveSpeed = 1f;
+    public float chaseSpeed = 2f;
     private bool isWaiting = false;
     
     // State variables
     enum State { Patrol, Chase, Return }
     private State currentState = State.Patrol;
 
-
     void Start()
     {
-        currentPoint = transform.position;
-        wayPoint1 = new Vector3(currentPoint.x, currentPoint.y + 3f);
-        wayPoint2 = currentPoint;
-        wayPoint3 = new Vector3(currentPoint.x + 2f, currentPoint.y);
-        wayPoint4 = currentPoint;
+        spawnPoint = transform.position;
+        wayPoint1 = new Vector3(spawnPoint.x, spawnPoint.y + 3f);
+        wayPoint2 = new Vector3(spawnPoint.x, spawnPoint.y - 0.3f);
+        wayPoint3 = new Vector3(spawnPoint.x + 2f, spawnPoint.y);
+        wayPoint4 = new Vector3(spawnPoint.x - 0.3f, spawnPoint.y);
         waypoints = new Vector3[4];
         waypoints[0] = wayPoint1;
         waypoints[1] = wayPoint2;
         waypoints[2] = wayPoint3;
         waypoints[3] = wayPoint4;
         targetWayPoint = waypoints[currentWayPointIndex];
-        if (player == null) player = GameObject.FindGameObjectWithTag("Player").transform;
+        player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     // Update is called once per frame
@@ -60,8 +61,27 @@ public class EnemyController : CharacterBase
                 CheckLeashDistance();
                 break;
             case State.Return:
-                ReturnToSpawn();
+                ReturnToPatrol();
                 break;
+        }
+    }
+
+    void FixedUpdate()
+    {
+    
+        if (!isWaiting)
+        {
+            if (currentState == State.Patrol)
+            {
+                MoveToTarget(moveSpeed, positionTolerance, targetWayPoint);
+            }
+            else if (currentState == State.Chase)
+            {
+                MoveToTarget(chaseSpeed, stoppingDistance, player.position);
+            } else if (currentState == State.Return)
+            {
+                MoveToTarget(moveSpeed, positionTolerance, targetWayPoint);
+            }
         }
     }
 
@@ -69,70 +89,69 @@ public class EnemyController : CharacterBase
     {
         if (!isWaiting)
         {
-            if (Vector3.Distance(transform.position, targetWayPoint) <= positionTolerance)
+            float distanceToTarget = Vector3.Distance(transform.position, targetWayPoint);
+            if (distanceToTarget <= positionTolerance)
             {
                 StartCoroutine(WaitAtWaypoint());
-                currentPoint = targetWayPoint;
-            }
-            else
-            {
-                transform.position = Vector3.MoveTowards(transform.position, targetWayPoint, moveSpeed * Time.deltaTime);
-            if (Vector3.Distance(transform.position, targetWayPoint) <= positionTolerance)
-                {
-                    StartCoroutine(WaitAtWaypoint());
-                    currentPoint = targetWayPoint;
-                }
             }
         }
     }
 
     void CheckForPlayer()
     {
-        if (Vector3.Distance(transform.position, player.position) < detectionRadius)
+        float distanceToTarget = Vector3.Distance(transform.position, player.position);
+        if (distanceToTarget <= detectionRadius)
         {
             currentState = State.Chase;
-            Vector3 direction = (player.position - transform.position).normalized;
         }
     }
 
     void ChasePlayer()
     {
+        float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer < detectionRadius && distanceToPlayer > stoppingDistance)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, player.position, moveSpeed/2 * Time.deltaTime);
-            // rb.linearVelocity = direction * moveSpeed;
-        } else if (Vector3.Distance(transform.position, targetWayPoint) > leashDistance)
+        if (distanceToTarget > leashDistance)
         {
             currentState = State.Return;
-        }
-         else
+        } else if (distanceToPlayer > detectionRadius)
         {
-            if (distanceToPlayer <= stoppingDistance)
-            {
-                transform.position = transform.position; // Stop moving
-            // Attack logic here
-            }
+            currentState = State.Return;
         }
     }
 
     void CheckLeashDistance()
     {
-        if (Vector3.Distance(transform.position, targetWayPoint) > leashDistance)
+        float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
+        if (distanceToTarget > leashDistance)
         {
-            Vector3 direction = (targetWayPoint - transform.position).normalized;
             currentState = State.Return;
         }
     }
 
-    void ReturnToSpawn()
+    void ReturnToPatrol()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetWayPoint, moveSpeed * Time.deltaTime);
-        if (Vector3.Distance(transform.position, targetWayPoint) < positionTolerance)
+        float distanceToTarget = Vector3.Distance(transform.position, targetWayPoint);
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer <= detectionRadius && distanceToTarget <= leashDistance)
         {
+            Debug.Log("Player detected during return, switching to chase" + distanceToTarget);
+            currentState = State.Chase;
+        } else if (distanceToTarget <= positionTolerance)
+         {
             currentState = State.Patrol;
-        }
+         }
+    }
 
+    void MoveToTarget(float speed, float stoppingDistance, Vector3 target)
+    {
+    
+        if (Vector3.Distance(transform.position, target) > stoppingDistance)
+        {
+            rb.MovePosition(Vector3.MoveTowards(transform.position, target, speed * Time.fixedDeltaTime));
+        } else
+        {
+            rb.MovePosition(transform.position); // Stop moving
+        }
     }
 
     IEnumerator WaitAtWaypoint()
