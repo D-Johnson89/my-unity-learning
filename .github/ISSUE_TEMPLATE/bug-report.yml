@@ -1,0 +1,41 @@
+name: "🐛 Bug Report"
+description: Report something that's broken
+title: "fix: <brief description>"
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: "Bug Description"
+      description: What's broken?
+      placeholder: "Player gets stuck in wall when moving left"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Steps to Reproduce"
+      value: |
+        1. Start the game
+        2. Move left into the wall
+        3. Player gets stuck
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected Behavior"
+      description: What should happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Error Logs"
+      description: Console errors, stack traces, etc.
+      render: bash
+    validations:
+      required: false
