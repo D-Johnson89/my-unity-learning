@@ -1,0 +1,34 @@
+name: "💡 Feature Request"
+description: Request a new feature or component
+title: "feat: <brief description>"
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Description"
+      description: What feature/component needs to be built?
+      placeholder: "Change player stats display to show health bars instead of numbers..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: "Requirements"
+      description: What should this feature do?
+      placeholder: |
+        - Display health bar above player
+        - Update health bar when player takes damage
+        - Show current health and max health values
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Additional Context"
+      description: Mockups, examples, related issues?
+      placeholder: "Related to #123, see ____ for mockups..."
+    validations:
+      required: false
