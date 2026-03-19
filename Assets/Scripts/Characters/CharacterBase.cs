@@ -5,8 +5,8 @@ using UnityEngine;
 public abstract class CharacterBase : MonoBehaviour
 {
     [Header("Base Stats")]
-    public int maxHealth = 100;
-    public int currentHealth;
+    public float maxHealth = 100;
+    public float currentHealth;
     
 
     protected Rigidbody2D rb;
@@ -17,7 +17,7 @@ public abstract class CharacterBase : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    public virtual void TakeDamage(int damage = 10)
+    public virtual void TakeDamage(float damage)
     {
         currentHealth -= damage;
         if (currentHealth <= 0) Die();

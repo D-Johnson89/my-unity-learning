@@ -26,9 +26,20 @@ public class EnemyController : CharacterBase
     public float moveSpeed = 1f;
     public float chaseSpeed = 2f;
     private bool isWaiting = false;
-    
+
+    // Combat variables
+    [Header("Combat Variables")]
+    [SerializeField] private float minDamage = 5f;
+    [SerializeField] private float maxDamage = 10f;
+    [SerializeField] private float attackRange = 1f;
+    [SerializeField] private float missChance = 0.1f;
+    [SerializeField] private float criticalChance = 0.15f;
+    [SerializeField] private float criticalMultiplier = 2f;
+    [SerializeField] private float attackCooldown = 2f;
+    private float nextAttackTime;
+
     // State variables
-    enum State { Patrol, Chase, Return }
+    enum State { Patrol, Chase, Return, Attack }
     private State currentState = State.Patrol;
 
     void Start()
@@ -62,6 +73,9 @@ public class EnemyController : CharacterBase
                 break;
             case State.Return:
                 ReturnToPatrol();
+                break;
+            case State.Attack:
+                AttackPlayer();
                 break;
         }
     }
@@ -150,7 +164,40 @@ public class EnemyController : CharacterBase
             rb.MovePosition(Vector3.MoveTowards(transform.position, target, speed * Time.fixedDeltaTime));
         } else
         {
-            rb.MovePosition(transform.position); // Stop moving
+            rb.MovePosition(transform.position); 
+            AttackPlayer();// Stop moving
+        }
+    }
+
+    void AttackPlayer()
+    {
+        if (Time.time >= nextAttackTime)
+        {
+            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+            if (distanceToPlayer <= attackRange)
+            {
+                // Calculate hit/miss
+                if (Random.value < missChance)
+                {
+                    Debug.Log("Enemy attack missed!");
+                    return;
+                }
+                // Calculate damage
+                float damage = Random.Range(minDamage, maxDamage);
+                if (Random.value < criticalChance)
+                {
+                    damage *= criticalMultiplier;
+                    Debug.Log("Critical hit! Damage: " + damage);
+                }  
+                else
+                {
+                    Debug.Log("Hit! Damage: " + damage);
+                }
+                    // Apply damage to player (assuming player has a TakeDamage method)
+                    player.GetComponent<PlayerController>().TakeDamage(damage);
+            }
+                nextAttackTime = Time.time + attackCooldown;
+                Debug.Log("Attacking player, next attack time: " + nextAttackTime);
         }
     }
 
