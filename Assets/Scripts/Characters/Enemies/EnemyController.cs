@@ -113,8 +113,8 @@ public class EnemyController : CharacterBase
 
     void CheckForPlayer()
     {
-        float distanceToTarget = Vector3.Distance(transform.position, player.position);
-        if (distanceToTarget <= detectionRadius)
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer <= detectionRadius)
         {
             currentState = State.Chase;
         }
@@ -130,6 +130,9 @@ public class EnemyController : CharacterBase
         } else if (distanceToPlayer > detectionRadius)
         {
             currentState = State.Return;
+        } else if (distanceToPlayer <= attackRange)
+        {
+            currentState = State.Attack;
         }
     }
 
@@ -164,41 +167,49 @@ public class EnemyController : CharacterBase
             rb.MovePosition(Vector3.MoveTowards(transform.position, target, speed * Time.fixedDeltaTime));
         } else
         {
-            rb.MovePosition(transform.position); 
-            AttackPlayer();// Stop moving
+            rb.MovePosition(transform.position);
         }
     }
 
     void AttackPlayer()
     {
-        if (Time.time >= nextAttackTime)
-        {
-            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-            if (distanceToPlayer <= attackRange)
+        float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer > attackRange && distanceToPlayer <= detectionRadius)
             {
-                // Calculate hit/miss
-                if (Random.value < missChance)
+                Debug.Log("Player out of attack range, switching to chase");
+                currentState = State.Chase;
+            } else if (distanceToPlayer > detectionRadius || distanceToTarget > leashDistance)
+            {
+                Debug.Log("Player out of detection range, switching to return");
+                currentState = State.Return;
+            } else if (Time.time >= nextAttackTime)
+            {
+                if (distanceToPlayer <= attackRange)
                 {
-                    Debug.Log("Enemy attack missed!");
-                    return;
+                    // Calculate hit/miss
+                    if (Random.value < missChance)
+                    {
+                        Debug.Log("Enemy attack missed!");
+                        return;
+                    }
+                    // Calculate damage
+                    float damage = Random.Range(minDamage, maxDamage);
+                    if (Random.value < criticalChance)
+                    {
+                        damage *= criticalMultiplier;
+                        Debug.Log("Critical hit! Damage: " + damage);
+                    }  
+                    else
+                    {
+                        Debug.Log("Hit! Damage: " + damage);
+                    }
+                        // Apply damage to player (assuming player has a TakeDamage method)
+                        player.GetComponent<PlayerController>().TakeDamage(damage);
+                        nextAttackTime = Time.time + attackCooldown;
                 }
-                // Calculate damage
-                float damage = Random.Range(minDamage, maxDamage);
-                if (Random.value < criticalChance)
-                {
-                    damage *= criticalMultiplier;
-                    Debug.Log("Critical hit! Damage: " + damage);
-                }  
-                else
-                {
-                    Debug.Log("Hit! Damage: " + damage);
-                }
-                    // Apply damage to player (assuming player has a TakeDamage method)
-                    player.GetComponent<PlayerController>().TakeDamage(damage);
+                    Debug.Log("Attacking player, next attack time: " + nextAttackTime);
             }
-                nextAttackTime = Time.time + attackCooldown;
-                Debug.Log("Attacking player, next attack time: " + nextAttackTime);
-        }
     }
 
     IEnumerator WaitAtWaypoint()
