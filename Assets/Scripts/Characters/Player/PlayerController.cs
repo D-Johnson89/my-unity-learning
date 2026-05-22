@@ -8,7 +8,9 @@ public class PlayerController : CharacterBase
     public float moveSpeed = 3f;
     private float horizontalInput;
     private float verticalInput;
-    private Vector2 lastMoveDirection;
+    private Vector2 lastPosition;
+    private Vector2 currentDirection;
+    private Vector2 movement;
 
     [Header("Combat Variables")]
     /*[SerializeField] private int maxMana = 50;
@@ -24,15 +26,47 @@ public class PlayerController : CharacterBase
     [SerializeField] private float attackCooldown = 1f;
     [SerializeField] private BoxCollider2D attackHitbox;
     [SerializeField] private float hitboxOffset = 0.5f;
+    [SerializeField] private Vector2 verticalHitbox = new Vector2(1.5f, 2f);
+    [SerializeField] private Vector2 horizontalHitbox = new Vector2(2f, 1.5f);
     [SerializeField] private float attackDuration = 0.5f;
     
     private float nextAttackTime;
 
+    void Start()
+    {
+        lastPosition = transform.position;
+        currentDirection = Vector2.down; // Default facing down
+        attackHitbox.enabled = false;
+    }
     void Update()
     {
+        // Get directional input
+        Vector2 currentPosition = transform.position;
+        movement = currentPosition - lastPosition;
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
-        lastMoveDirection = new Vector2(horizontalInput, verticalInput).normalized;
+        //
+        if (movement.sqrMagnitude > 0.01f)
+        {
+            float absHorizontal = Mathf.Abs(movement.x);
+            float absVertical = Mathf.Abs(movement.y);
+
+            if (absHorizontal > absVertical)
+            {
+                currentDirection = (movement.x > 0) ? Vector2.right : Vector2.left;
+                attackHitbox.size = horizontalHitbox;
+            }
+            else
+            {
+                currentDirection = (movement.y > 0) ? Vector2.up : Vector2.down;
+                attackHitbox.size = verticalHitbox;
+            }
+
+            Debug.Log("Current direction: " + currentDirection);
+            lastPosition = transform.position;
+        }
+
+        // Handle attack input
         if (Input.GetKeyDown(KeyCode.Space) && Time.time >= nextAttackTime)
         {
             Debug.Log("Player attacking, time: " + Time.time);
@@ -50,9 +84,20 @@ public class PlayerController : CharacterBase
         Debug.Log("Attack started, time: " + Time.time);
         // Detect enemies in range
         attackHitbox.enabled = true;
-        attackHitbox.offset = lastMoveDirection * hitboxOffset;
+        attackHitbox.offset = currentDirection * hitboxOffset;
         yield return new WaitForSeconds(attackDuration);
         attackHitbox.enabled = false;
+    }
+
+    void OnDrawGizmos()
+    {
+        if (attackHitbox != null)
+        {
+            Vector3 gizmoOffset = new Vector3(currentDirection.x * hitboxOffset, currentDirection.y * hitboxOffset, 0);
+            Vector3 gizmoSize = new Vector3(attackHitbox.size.x, attackHitbox.size.y, 0);
+            Gizmos.color = Color.black;
+            Gizmos.DrawWireCube(transform.position + gizmoOffset, gizmoSize);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -91,6 +136,7 @@ public class PlayerController : CharacterBase
             
         }
     }
+
     protected override void Die()
     {
         Destroy(gameObject);
