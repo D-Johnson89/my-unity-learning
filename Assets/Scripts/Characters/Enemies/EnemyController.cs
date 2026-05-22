@@ -6,7 +6,7 @@ using UnityEngine;
 public class EnemyController : CharacterBase
 {
 
-    // Patrol variables
+    [Header("Patrol Variables")]
     public Transform player;
     public Vector3 wayPoint1;
     public Vector3 wayPoint2;
@@ -17,7 +17,7 @@ public class EnemyController : CharacterBase
     private Vector3 spawnPoint;
     public Vector3 targetWayPoint;
 
-    // Enemy variables
+    [Header("Movement Variables")]
     public float positionTolerance = 0.2f;
     public float detectionRadius = 2f;
     public float leashDistance = 4.5f;
@@ -27,7 +27,7 @@ public class EnemyController : CharacterBase
     public float chaseSpeed = 2f;
     private bool isWaiting = false;
 
-    // Combat variables
+    
     [Header("Combat Variables")]
     [SerializeField] private float minDamage = 5f;
     [SerializeField] private float maxDamage = 10f;
@@ -38,7 +38,7 @@ public class EnemyController : CharacterBase
     [SerializeField] private float attackCooldown = 2f;
     private float nextAttackTime;
 
-    // State variables
+    // State Variables
     enum State { Patrol, Chase, Return, Attack }
     private State currentState = State.Patrol;
 
@@ -198,17 +198,17 @@ public class EnemyController : CharacterBase
                     if (Random.value < criticalChance)
                     {
                         damage *= criticalMultiplier;
-                        Debug.Log("Critical hit! Damage: " + damage);
+                        Debug.Log("Critical hit! Damage to player: " + damage);
                     }  
                     else
                     {
-                        Debug.Log("Hit! Damage: " + damage);
+                        Debug.Log("Hit! Damage to player: " + damage);
                     }
                         // Apply damage to player (assuming player has a TakeDamage method)
-                        player.GetComponent<PlayerController>().TakeDamage(damage);
+                        player.GetComponent<CharacterBase>().TakeDamage(damage);
                         nextAttackTime = Time.time + attackCooldown;
                 }
-                    Debug.Log("Attacking player, next attack time: " + nextAttackTime);
+                Debug.Log("Attacking player, next attack time: " + nextAttackTime);
             }
     }
 

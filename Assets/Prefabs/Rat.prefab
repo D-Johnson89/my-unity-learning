@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8111516605660343422}
   m_Layer: 0
   m_Name: Rat
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -195,3 +195,10 @@ MonoBehaviour:
   waitTime: 1
   moveSpeed: 1
   chaseSpeed: 2
+  minDamage: 5
+  maxDamage: 10
+  attackRange: 1
+  missChance: 0.1
+  criticalChance: 0.15
+  criticalMultiplier: 2
+  attackCooldown: 1.5
