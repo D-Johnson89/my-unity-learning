@@ -7,15 +7,11 @@ public class EnemyController : CharacterBase
 {
 
     [Header("Patrol Variables")]
-    public Transform player;
-    public Vector3 wayPoint1;
-    public Vector3 wayPoint2;
-    public Vector3 wayPoint3;
-    public Vector3 wayPoint4;
-    public Vector3[] waypoints;
+    private Transform player;
+    private Vector3[] waypoints;
     private int currentWayPointIndex = 0;
     private Vector3 spawnPoint;
-    public Vector3 targetWayPoint;
+    private Vector3 targetWayPoint;
 
     [Header("Movement Variables")]
     public float positionTolerance = 0.2f;
@@ -39,16 +35,16 @@ public class EnemyController : CharacterBase
     private float nextAttackTime;
 
     // State Variables
-    enum State { Patrol, Chase, Return, Attack }
+    private enum State { Patrol, Chase, Return, Attack }
     private State currentState = State.Patrol;
 
     void Start()
     {
         spawnPoint = transform.position;
-        wayPoint1 = new Vector3(spawnPoint.x, spawnPoint.y + 3f);
-        wayPoint2 = new Vector3(spawnPoint.x, spawnPoint.y - 0.3f);
-        wayPoint3 = new Vector3(spawnPoint.x + 2f, spawnPoint.y);
-        wayPoint4 = new Vector3(spawnPoint.x - 0.3f, spawnPoint.y);
+        Vector3 wayPoint1 = new Vector3(spawnPoint.x, spawnPoint.y + 3f);
+        Vector3 wayPoint2 = new Vector3(spawnPoint.x, spawnPoint.y - 0.3f);
+        Vector3 wayPoint3 = new Vector3(spawnPoint.x + 2f, spawnPoint.y);
+        Vector3 wayPoint4 = new Vector3(spawnPoint.x - 0.3f, spawnPoint.y);
         waypoints = new Vector3[4];
         waypoints[0] = wayPoint1;
         waypoints[1] = wayPoint2;
@@ -122,12 +118,8 @@ public class EnemyController : CharacterBase
 
     void ChasePlayer()
     {
-        float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToTarget > leashDistance)
-        {
-            currentState = State.Return;
-        } else if (distanceToPlayer > detectionRadius)
+        if (distanceToPlayer > detectionRadius)
         {
             currentState = State.Return;
         } else if (distanceToPlayer <= attackRange)
@@ -151,7 +143,6 @@ public class EnemyController : CharacterBase
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= detectionRadius && distanceToTarget <= leashDistance)
         {
-            Debug.Log("Player detected during return, switching to chase" + distanceToTarget);
             currentState = State.Chase;
         } else if (distanceToTarget <= positionTolerance)
          {
@@ -177,16 +168,12 @@ public class EnemyController : CharacterBase
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer > attackRange && distanceToPlayer <= detectionRadius)
             {
-                Debug.Log("Player out of attack range, switching to chase");
                 currentState = State.Chase;
             } else if (distanceToPlayer > detectionRadius || distanceToTarget > leashDistance)
             {
-                Debug.Log("Player out of detection range, switching to return");
                 currentState = State.Return;
             } else if (Time.time >= nextAttackTime)
             {
-                if (distanceToPlayer <= attackRange)
-                {
                     // Calculate hit/miss
                     if (Random.value < missChance)
                     {
@@ -207,7 +194,6 @@ public class EnemyController : CharacterBase
                         // Apply damage to player (assuming player has a TakeDamage method)
                         player.GetComponent<CharacterBase>().TakeDamage(damage);
                         nextAttackTime = Time.time + attackCooldown;
-                }
                 Debug.Log("Attacking player, next attack time: " + nextAttackTime);
             }
     }
