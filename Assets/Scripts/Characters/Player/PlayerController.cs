@@ -18,7 +18,6 @@ public class PlayerController : CharacterBase
     [SerializeField] private float manaRegenRate = 5f;*/
     [SerializeField] private float minDamage = 6f;
     [SerializeField] private float maxDamage = 12f;
-    [SerializeField] private float attackRange = 1.25f;
     [SerializeField] private float missChance = 0.1f;
     [SerializeField] private float criticalChance = 0.15f;
     [SerializeField] private float criticalMultiplier = 2.25f;

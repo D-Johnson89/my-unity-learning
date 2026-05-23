@@ -8,6 +8,5 @@ public class SpawnConfig
     public int spawnCount;
     public float spawnInterval;
     public Transform spawnPosition;
-    public Quaternion spawnRotation;
     public Transform spawnParent;
 }
