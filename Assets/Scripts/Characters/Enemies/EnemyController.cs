@@ -33,8 +33,8 @@ public class EnemyController : CharacterBase
     private float nextAttackTime;
 
     [Header("State Management Variables")]
-    private enum State { Patrol, Chase, Return, Attack }
     private State currentState = State.Patrol;
+    private enum State { Patrol, Chase, Return, Attack }
 
     private void Start()
     {
