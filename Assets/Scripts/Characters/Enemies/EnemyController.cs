@@ -1,8 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-// Base Enemy AI/Movement
+// EnemyController handles all behavior for enemy characters, including patrolling between waypoints, chasing the player when detected, returning to patrol route if player escapes, and attacking the player when in range. Inherits from CharacterBase which provides basic health and damage functionality.
 public class EnemyController : CharacterBase
 {
 
@@ -14,15 +13,14 @@ public class EnemyController : CharacterBase
     private Vector3 targetWayPoint;
 
     [Header("Movement Variables")]
-    public float positionTolerance = 0.2f;
-    public float detectionRadius = 2f;
-    public float leashDistance = 4.5f;
-    public float stoppingDistance = 0.8f;
-    public float waitTime = 1f;
-    public float moveSpeed = 1f;
-    public float chaseSpeed = 2f;
-    private bool isWaiting = false;
-
+    [SerializeField] private float detectionRadius = 2f;
+    [SerializeField] private float leashDistance = 4.5f;
+    [SerializeField] private float chaseSpeed = 2f;
+    [SerializeField] private float waitTime = 1f;
+    [SerializeField] private float moveSpeed = 1f;
+    [SerializeField] private float stoppingDistance = 0.8f;
+    private float positionTolerance = 0.2f;
+    private bool isWaiting;
     
     [Header("Combat Variables")]
     [SerializeField] private float minDamage = 5f;
@@ -34,11 +32,11 @@ public class EnemyController : CharacterBase
     [SerializeField] private float attackCooldown = 2f;
     private float nextAttackTime;
 
-    // State Variables
-    private enum State { Patrol, Chase, Return, Attack }
+    [Header("State Management Variables")]
     private State currentState = State.Patrol;
+    private enum State { Patrol, Chase, Return, Attack }
 
-    void Start()
+    private void Start()
     {
         spawnPoint = transform.position;
         Vector3 wayPoint1 = new Vector3(spawnPoint.x, spawnPoint.y + 3f);
@@ -54,8 +52,7 @@ public class EnemyController : CharacterBase
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         switch (currentState)
         {
@@ -76,9 +73,9 @@ public class EnemyController : CharacterBase
         }
     }
 
-    void FixedUpdate()
+    // Handles all movement towards a target, used for patrol, chase, and return states
+    private void FixedUpdate()
     {
-    
         if (!isWaiting)
         {
             if (currentState == State.Patrol)
@@ -95,7 +92,8 @@ public class EnemyController : CharacterBase
         }
     }
 
-    void Patrol()
+    // Handles patrolling between waypoints, if within tolerance of target waypoint start wait coroutine to pause before moving to next waypoint
+    private void Patrol()
     {
         if (!isWaiting)
         {
@@ -107,7 +105,8 @@ public class EnemyController : CharacterBase
         }
     }
 
-    void CheckForPlayer()
+    // Checks for player within detection radius, if found switch to chase state
+    private void CheckForPlayer()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= detectionRadius)
@@ -116,7 +115,8 @@ public class EnemyController : CharacterBase
         }
     }
 
-    void ChasePlayer()
+    // Handles chasing the player, if player moves out of detection radius switch to return state, if player moves within attack range switch to attack state
+    private void ChasePlayer()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer > detectionRadius)
@@ -128,7 +128,8 @@ public class EnemyController : CharacterBase
         }
     }
 
-    void CheckLeashDistance()
+    // Checks if player has moved beyond leash distance from spawn point, if so switch to return state
+    private void CheckLeashDistance()
     {
         float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
         if (distanceToTarget > leashDistance)
@@ -137,7 +138,8 @@ public class EnemyController : CharacterBase
         }
     }
 
-    void ReturnToPatrol()
+    // Handles returning to patrol route, if player moves back within detection radius and leash distance switch to chase state, if reaches target waypoint switch to patrol state
+    private void ReturnToPatrol()
     {
         float distanceToTarget = Vector3.Distance(transform.position, targetWayPoint);
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
@@ -150,9 +152,9 @@ public class EnemyController : CharacterBase
          }
     }
 
-    void MoveToTarget(float speed, float stoppingDistance, Vector3 target)
+    // Handles actual movement function called from FixedUpdate, moves towards target position at given speed, if within stopping distance of target will stop moving
+    private void MoveToTarget(float speed, float stoppingDistance, Vector3 target)
     {
-    
         if (Vector3.Distance(transform.position, target) > stoppingDistance)
         {
             rb.MovePosition(Vector3.MoveTowards(transform.position, target, speed * Time.fixedDeltaTime));
@@ -162,43 +164,49 @@ public class EnemyController : CharacterBase
         }
     }
 
-    void AttackPlayer()
+    // Handles attacking the player, checks for miss and critical hit chances, applies damage to player if attack hits, switches back to chase state after attack
+    private void AttackPlayer()
     {
         float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
         if (distanceToPlayer > attackRange && distanceToPlayer <= detectionRadius)
+        {
+            currentState = State.Chase;
+        } else if (distanceToPlayer > detectionRadius || distanceToTarget > leashDistance)
+        {
+            currentState = State.Return;
+        } else if (Time.time >= nextAttackTime)
+        {
+            // Calculate hit/miss
+            if (Random.value < missChance)
             {
-                currentState = State.Chase;
-            } else if (distanceToPlayer > detectionRadius || distanceToTarget > leashDistance)
-            {
-                currentState = State.Return;
-            } else if (Time.time >= nextAttackTime)
-            {
-                    // Calculate hit/miss
-                    if (Random.value < missChance)
-                    {
-                        Debug.Log("Enemy attack missed!");
-                        return;
-                    }
-                    // Calculate damage
-                    float damage = Random.Range(minDamage, maxDamage);
-                    if (Random.value < criticalChance)
-                    {
-                        damage *= criticalMultiplier;
-                        Debug.Log("Critical hit! Damage to player: " + damage);
-                    }  
-                    else
-                    {
-                        Debug.Log("Hit! Damage to player: " + damage);
-                    }
-                        // Apply damage to player (assuming player has a TakeDamage method)
-                        player.GetComponent<CharacterBase>().TakeDamage(damage);
-                        nextAttackTime = Time.time + attackCooldown;
-                Debug.Log("Attacking player, next attack time: " + nextAttackTime);
+                Debug.Log("Enemy attack missed!");
+                return;
             }
+            // Calculate damage
+            float damage = Random.Range(minDamage, maxDamage);
+            if (Random.value < criticalChance)
+            {
+                damage *= criticalMultiplier;
+                Debug.Log("Critical hit! Damage to player: " + damage);
+            }  
+            else
+            {
+                Debug.Log("Hit! Damage to player: " + damage);
+            }
+            CharacterBase playerCharacter = player.GetComponent<CharacterBase>();
+            if (playerCharacter != null)
+            {
+                playerCharacter.TakeDamage(damage);
+            }
+            nextAttackTime = Time.time + attackCooldown;
+            Debug.Log("Attacking player, next attack time: " + nextAttackTime);
+        }
     }
 
-    IEnumerator WaitAtWaypoint()
+    // Coroutine to handle waiting at waypoints, sets isWaiting to true to prevent movement, waits for specified time, then updates target waypoint and sets isWaiting to false to resume movement
+    private IEnumerator WaitAtWaypoint()
     {
         isWaiting = true;
         yield return new WaitForSeconds(waitTime);
@@ -207,6 +215,7 @@ public class EnemyController : CharacterBase
         isWaiting = false;
     }
     
+    // Handles enemy death, currently just destroys the game object, can be expanded to include death animation, loot drops, etc.
     protected override void Die()
     {
         Destroy(gameObject);

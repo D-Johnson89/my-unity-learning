@@ -1,21 +1,16 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : CharacterBase
 {
     [Header("Player Variables")]
-    public float moveSpeed = 3f;
+    [SerializeField] private float moveSpeed = 3f;
     private float horizontalInput;
     private float verticalInput;
     private Vector2 lastPosition;
     private Vector2 currentDirection;
 
     [Header("Combat Variables")]
-    /*[SerializeField] private int maxMana = 50;
-    [SerializeField] private int currentMana;
-    [SerializeField] private int manaCost;
-    [SerializeField] private float manaRegenRate = 5f;*/
     [SerializeField] private float minDamage = 6f;
     [SerializeField] private float maxDamage = 12f;
     [SerializeField] private float missChance = 0.1f;
@@ -27,23 +22,24 @@ public class PlayerController : CharacterBase
     [SerializeField] private Vector2 verticalHitbox = new Vector2(1.5f, 2f);
     [SerializeField] private Vector2 horizontalHitbox = new Vector2(2f, 1.5f);
     [SerializeField] private float attackDuration = 0.5f;
-    
     private float nextAttackTime;
 
-    void Start()
+    private void Start()
     {
         lastPosition = transform.position;
         currentDirection = Vector2.down; // Default facing down
         attackHitbox.enabled = false;
     }
-    void Update()
+
+    // Handles player input for movement and attacks, determines attack direction based on movement direction, and manages attack cooldowns
+    private void Update()
     {
         // Get directional input
         Vector2 currentPosition = transform.position;
         Vector2 movement = currentPosition - lastPosition;
         horizontalInput = Input.GetAxis("Horizontal");
         verticalInput = Input.GetAxis("Vertical");
-        //
+        
         if (movement.sqrMagnitude > 0.01f)
         {
             float absHorizontal = Mathf.Abs(movement.x);
@@ -70,21 +66,25 @@ public class PlayerController : CharacterBase
         }
         
     }
-    void FixedUpdate()
+
+    // Handle movement in FixedUpdate for consistent physics updates
+    private void FixedUpdate()
     {
         Move(horizontalInput, verticalInput, moveSpeed);
     }
 
+    // Coroutine to manage attack timing, enables hitbox for duration of attack then disables it
     private IEnumerator Attack()
     {
-        // Detect enemies in range
+        // Enable hitbox and set offset based on current direction, then disable after attack duration
         attackHitbox.enabled = true;
         attackHitbox.offset = currentDirection * hitboxOffset;
         yield return new WaitForSeconds(attackDuration);
         attackHitbox.enabled = false;
     }
 
-    void OnDrawGizmos()
+    // Draw the attack hitbox in the editor for tuning and debuging purposes, offset in the direction the player is facing
+    private void OnDrawGizmos()
     {
         if (attackHitbox != null)
         {
@@ -95,7 +95,8 @@ public class PlayerController : CharacterBase
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    // Handle collision with enemy hitboxes, checks for miss and critical hit chances, applies damage to enemy if attack hits, sets next attack time based on cooldown
+    private void OnTriggerEnter2D(Collider2D other)
     {  
         if (other.CompareTag("Enemy"))
         {
@@ -117,7 +118,7 @@ public class PlayerController : CharacterBase
             {
                 Debug.Log("Hit! Damage to enemy: " + damage);
             }
-            // Apply damage to enemy (assuming enemy has a TakeDamage method)
+
             CharacterBase enemyCharacter = other.GetComponent<CharacterBase>();
             if (enemyCharacter != null)
             {
@@ -129,6 +130,7 @@ public class PlayerController : CharacterBase
         }
     }
 
+    // Override the Die method from CharacterBase to handle player death, currently just destroys the player game object but can be expanded to include death animations, game over screens, etc.
     protected override void Die()
     {
         Destroy(gameObject);
