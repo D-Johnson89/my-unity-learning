@@ -1,14 +1,16 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : CharacterBase
 {
     [Header("Player Variables")]
     [SerializeField] private float moveSpeed = 3f;
-    private float horizontalInput;
-    private float verticalInput;
+    private PlayerInput _playerInput;
+    private InputActionMap _playerActionMap;
     private Vector2 lastPosition;
     private Vector2 currentDirection;
+    private Vector2 moveInput;
 
     [Header("Combat Variables")]
     [SerializeField] private float minDamage = 6f;
@@ -24,11 +26,28 @@ public class PlayerController : CharacterBase
     [SerializeField] private float attackDuration = 0.5f;
     private float nextAttackTime;
 
+    // Initialize player input and action map
+    private void Awake()
+    {
+        base.Awake();
+        // Cache component reference
+        _playerInput = GetComponent<PlayerInput>();
+        // find and cache specific action map
+        _playerActionMap = _playerInput.actions.FindActionMap("Player");
+    }
+
+    // Set initial position and direction, disable attack hitbox at start
     private void Start()
     {
         lastPosition = transform.position;
         currentDirection = Vector2.down; // Default facing down
         attackHitbox.enabled = false;
+    }
+
+    // Safely enable the player action map when the player is enabled
+    private void OnEnable()
+    {
+        _playerActionMap?.Enable();
     }
 
     // Handles player input for movement and attacks, determines attack direction based on movement direction, and manages attack cooldowns
@@ -37,8 +56,6 @@ public class PlayerController : CharacterBase
         // Get directional input
         Vector2 currentPosition = transform.position;
         Vector2 movement = currentPosition - lastPosition;
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
         
         if (movement.sqrMagnitude > 0.01f)
         {
@@ -58,19 +75,28 @@ public class PlayerController : CharacterBase
 
             lastPosition = transform.position;
         }
-
-        // Handle attack input
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time >= nextAttackTime)
-        {
-            StartCoroutine(Attack());
-        }
         
+    }
+
+    // Handle movement from input system, reads the movement vector from the input context and stores it for use in FixedUpdate
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
     }
 
     // Handle movement in FixedUpdate for consistent physics updates
     private void FixedUpdate()
     {
-        Move(horizontalInput, verticalInput, moveSpeed);
+        Move(moveInput.x, moveInput.y, moveSpeed);
+    }
+
+    // Handle attack input from input system, checks if the attack can be performed based on cooldown and starts the attack coroutine if possible
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.performed && Time.time >= nextAttackTime)
+        {
+            StartCoroutine(Attack());
+        }
     }
 
     // Coroutine to manage attack timing, enables hitbox for duration of attack then disables it
@@ -83,7 +109,7 @@ public class PlayerController : CharacterBase
         attackHitbox.enabled = false;
     }
 
-    // Draw the attack hitbox in the editor for tuning and debuging purposes, offset in the direction the player is facing
+    // Draw the attack hitbox in the editor for tuning and debugging purposes, offset in the direction the player is facing
     private void OnDrawGizmos()
     {
         if (attackHitbox != null)
@@ -134,6 +160,12 @@ public class PlayerController : CharacterBase
     protected override void Die()
     {
         Destroy(gameObject);
+    }
+
+    // Safely disable the player action map when the player is disabled
+    private void OnDisable()
+    {
+        _playerActionMap?.Disable();
     }
 
 }
