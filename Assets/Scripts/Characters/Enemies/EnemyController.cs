@@ -11,16 +11,15 @@ public class EnemyController : CharacterBase
     private int currentWayPointIndex = 0;
     private Vector3 spawnPoint;
     private Vector3 targetWayPoint;
+    private float positionTolerance = 0.2f;
+    private bool isWaiting;
 
     [Header("Movement Variables")]
-    [SerializeField] private float detectionRadius = 2f;
     [SerializeField] private float leashDistance = 4.5f;
     [SerializeField] private float chaseSpeed = 2f;
     [SerializeField] private float waitTime = 1f;
     [SerializeField] private float moveSpeed = 1f;
     [SerializeField] private float stoppingDistance = 0.8f;
-    private float positionTolerance = 0.2f;
-    private bool isWaiting;
     
     [Header("Combat Variables")]
     [SerializeField] private float minDamage = 5f;
@@ -54,11 +53,11 @@ public class EnemyController : CharacterBase
 
     private void Update()
     {
+        Debug.Log(currentState);
         switch (currentState)
         {
             case State.Patrol:
                 Patrol();
-                CheckForPlayer();
                 break;
             case State.Chase:
                 ChasePlayer();
@@ -105,11 +104,10 @@ public class EnemyController : CharacterBase
         }
     }
 
-    // Checks for player within detection radius, if found switch to chase state
-    private void CheckForPlayer()
+    // Handles detecting player within detection radius, if found switch to chase state
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= detectionRadius)
+        if (collision.CompareTag("Player"))
         {
             currentState = State.Chase;
         }
@@ -119,10 +117,7 @@ public class EnemyController : CharacterBase
     private void ChasePlayer()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer > detectionRadius)
-        {
-            currentState = State.Return;
-        } else if (distanceToPlayer <= attackRange)
+        if (distanceToPlayer <= attackRange)
         {
             currentState = State.Attack;
         }
@@ -137,16 +132,21 @@ public class EnemyController : CharacterBase
             currentState = State.Return;
         }
     }
+    
+    // Handles exiting collision with player, if player moves out of detection radius switch to return state
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            currentState = State.Return;
+        }
+    }
 
-    // Handles returning to patrol route, if player moves back within detection radius and leash distance switch to chase state, if reaches target waypoint switch to patrol state
+    // Handles returning to patrol route, checks if within tolerance of target waypoint, if so switch back to patrol state
     private void ReturnToPatrol()
     {
         float distanceToTarget = Vector3.Distance(transform.position, targetWayPoint);
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= detectionRadius && distanceToTarget <= leashDistance)
-        {
-            currentState = State.Chase;
-        } else if (distanceToTarget <= positionTolerance)
+        if (distanceToTarget <= positionTolerance)
          {
             currentState = State.Patrol;
          }
@@ -167,13 +167,12 @@ public class EnemyController : CharacterBase
     // Handles attacking the player, checks for miss and critical hit chances, applies damage to player if attack hits, switches back to chase state after attack
     private void AttackPlayer()
     {
-        float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-
-        if (distanceToPlayer > attackRange && distanceToPlayer <= detectionRadius)
+        float distanceToTarget = Vector3.Distance(transform.position, spawnPoint);
+        if (distanceToPlayer > attackRange)
         {
             currentState = State.Chase;
-        } else if (distanceToPlayer > detectionRadius || distanceToTarget > leashDistance)
+        } else if (distanceToTarget > leashDistance)
         {
             currentState = State.Return;
         } else if (Time.time >= nextAttackTime)
