@@ -53,7 +53,6 @@ public class EnemyController : CharacterBase
 
     private void Update()
     {
-        Debug.Log(currentState);
         switch (currentState)
         {
             case State.Patrol:
