@@ -27,7 +27,7 @@ public class PlayerController : CharacterBase
     private float nextAttackTime;
 
     // Initialize player input and action map
-    private void Awake()
+    protected override void Awake()
     {
         base.Awake();
         // Cache component reference
