@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: fcaa7ec38c4f8ff8fa8e4b3fd86019dd
+guid: 22e712cdadf873493aaf490c25924659
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1216040433499766831
-    second: tile_0098_0
+      213: 1948035008154585338
+    second: tile_0099_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: tile_0098_0
+      name: InnKeeper
       rect:
         serializedVersion: 2
         x: 0
@@ -121,15 +121,15 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f200447d45e30e010800000000000000
-      internalID: 1216040433499766831
+      spriteID: af8441fc48fc80b10800000000000000
+      internalID: 1948035008154585338
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 9f220990264adf7319739303711799f4
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      tile_0098_0: 1216040433499766831
+      InnKeeper: 1948035008154585338
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
