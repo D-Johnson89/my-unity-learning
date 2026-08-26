@@ -180,9 +180,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45399cdb4b9ba55d797852e3e685bd26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  maxHealth: 100
+  maxHealth: 18
   currentHealth: 0
-  detectionRadius: 2
   leashDistance: 4.5
   chaseSpeed: 2
   waitTime: 1
@@ -192,7 +191,7 @@ MonoBehaviour:
   maxDamage: 10
   attackRange: 1
   missChance: 0.1
-  criticalChance: 0.15
+  criticalChance: 0.05
   criticalMultiplier: 2
   attackCooldown: 1.5
 --- !u!58 &4802958634572395947
