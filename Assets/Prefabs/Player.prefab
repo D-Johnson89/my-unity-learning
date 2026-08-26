@@ -184,12 +184,12 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 0
   moveSpeed: 3
-  minDamage: 5
-  maxDamage: 10
+  minDamage: 6
+  maxDamage: 12
   missChance: 0.1
   criticalChance: 0.15
   criticalMultiplier: 2.25
-  attackCooldown: 2
+  attackCooldown: 1
   attackHitbox: {fileID: 8420250079818726333}
   hitboxOffset: 0.5
   verticalHitbox: {x: 1.5, y: 2}
