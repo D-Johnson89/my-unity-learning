@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4802958634572395947}
   m_Layer: 0
   m_Name: Mouse
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -180,6 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45399cdb4b9ba55d797852e3e685bd26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  uiHandler: {fileID: 0}
   maxHealth: 18
   currentHealth: 0
   leashDistance: 4.5

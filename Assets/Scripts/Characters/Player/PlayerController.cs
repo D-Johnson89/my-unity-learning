@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using System.Linq;       
 
 public class PlayerController : CharacterBase
 {
@@ -25,6 +27,13 @@ public class PlayerController : CharacterBase
     [SerializeField] private Vector2 horizontalHitbox = new Vector2(2f, 1.5f);
     [SerializeField] private float attackDuration = 0.5f;
     private float nextAttackTime;
+    public float maxMana = 60;
+    protected float currentMana;
+    protected float baseManaRegen = 0f;
+    private float manaFillAmount;
+    protected List<float> manaRegenModifiers = new List<float>();
+
+    public float ManaRegen => baseManaRegen + manaRegenModifiers.Sum();
 
     // Initialize player input and action map
     protected override void Awake()
@@ -42,6 +51,7 @@ public class PlayerController : CharacterBase
         lastPosition = transform.position;
         currentDirection = Vector2.down; // Default facing down
         attackHitbox.enabled = false;
+        currentMana = maxMana;
     }
 
     // Safely enable the player action map when the player is enabled
@@ -75,6 +85,17 @@ public class PlayerController : CharacterBase
 
             lastPosition = transform.position;
         }
+
+        currentMana += ManaRegen * Time.deltaTime;
+        if (currentMana > maxMana)
+        {
+            currentMana = maxMana;
+        }
+        manaFillAmount = currentMana / (float)maxMana;
+        if (uiHandler != null)
+        {
+            uiHandler.SetFill(manaFillAmount, UIHandler.BarType.Mana);
+        }
         
     }
 
@@ -107,6 +128,22 @@ public class PlayerController : CharacterBase
         attackHitbox.offset = currentDirection * hitboxOffset;
         yield return new WaitForSeconds(attackDuration);
         attackHitbox.enabled = false;
+    }
+
+    // Method to use mana, takes the amount of mana to consume as parameter
+    public virtual bool SpendMana(float cost)
+    {
+        if (currentMana < cost)
+        {
+            return false;
+        }
+        currentMana -= cost;
+        manaFillAmount = currentMana / (float)maxMana;
+        if (uiHandler != null)
+        {
+            uiHandler.SetFill(manaFillAmount, UIHandler.BarType.Mana);
+        }
+        return true;
     }
 
     // Draw the attack hitbox in the editor for tuning and debugging purposes, offset in the direction the player is facing
