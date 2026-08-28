@@ -6,31 +6,33 @@ public abstract class CharacterBase : MonoBehaviour
     protected Rigidbody2D rb;
 
     [Header("UI Element")]
-    [SerializeField] private UIHandler uiHandler;
+    [SerializeField] protected UIHandler uiHandler;
     
     [Header("Base Stats")]
     public float maxHealth = 100;
     public float currentHealth;
-    private float fillAmount;
+    private float healthFillAmount;
+    
 
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
-        fillAmount = currentHealth / (float)maxHealth;
     }
+
 
     // Method to apply damage to the character, takes single damage value as parameter
     public virtual void TakeDamage(float damage)
     {
         currentHealth -= damage;
-        fillAmount = currentHealth / (float)maxHealth;
+        healthFillAmount = currentHealth / (float)maxHealth;
         if (uiHandler != null)
         {
-            uiHandler.SetFill(fillAmount, UIHandler.BarType.Health);
+            uiHandler.SetFill(healthFillAmount, UIHandler.BarType.Health);
         }
         if (currentHealth <= 0) Die();
     }
+
 
     // Abstract method to be implemented by derived classes for character death behavior
     protected abstract void Die();
